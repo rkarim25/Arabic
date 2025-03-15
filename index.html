@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arabic Typing Tool (Simplified)</title>
+    <title>Arabic Typing Tool (Enhanced)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -78,6 +78,12 @@
             font-size: 16px;
             color: #777;
             margin-top: 3px;
+        }
+        .prefix-notation {
+            display: block;
+            font-size: 10px;
+            color: #555;
+            margin-top: 2px;
         }
         .button-container {
             display: flex;
@@ -214,6 +220,26 @@
         .tab-content.active {
             display: block;
         }
+        .guide-hint {
+            font-size: 14px;
+            color: #666;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fafafa;
+            border-radius: 4px;
+        }
+        .caps-notice {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 8px 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            border-left: 4px solid #ffc107;
+        }
+        .caps-notice strong {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -233,7 +259,7 @@
         
         <div>
             <label for="latin-input"><strong>Type using Latin characters:</strong></label>
-            <textarea id="latin-input" placeholder="Type here using our transliteration system..."></textarea>
+            <textarea id="latin-input" placeholder="Type here using our transliteration system... Note: Capitalization matters! Capital letters like A, H, S, T, D, Z, E represent different Arabic letters than their lowercase counterparts."></textarea>
         </div>
         
         <div>
@@ -252,6 +278,7 @@
                     <button class="tab-button active" data-tab="basic-chars">Basic</button>
                     <button class="tab-button" data-tab="special-chars">Special</button>
                     <button class="tab-button" data-tab="diacritics-chars">Diacritics</button>
+                    <button class="tab-button" data-tab="number-chars">Numbers</button>
                 </div>
                 
                 <div id="basic-chars" class="tab-content active">
@@ -269,60 +296,106 @@
                     <div class="keyboard-row" id="diacritics-row"></div>
                     <div class="keyboard-row" id="other-diacritics-row"></div>
                 </div>
+                
+                <div id="number-chars" class="tab-content">
+                    <div class="keyboard-row" id="number-row"></div>
+                </div>
             </div>
         </div>
         
         <div class="instructions">
             <h3>Transliteration Guide</h3>
-            <table>
-                <tr>
-                    <th>Latin</th>
-                    <th>Arabic</th>
-                    <th>Example</th>
-                </tr>
-                <tr><td>A</td><td>ا (alif)</td><td>Alqalam (القلم)</td></tr>
-                <tr><td>b</td><td>ب (baa)</td><td>bayt (بَيْت)</td></tr>
-                <tr><td>t</td><td>ت (taa)</td><td>tamr (تَمْر)</td></tr>
-                <tr><td>th</td><td>ث (thaa)</td><td>thalj (ثَلْج)</td></tr>
-                <tr><td>j</td><td>ج (jeem)</td><td>jamal (جَمَل)</td></tr>
-                <tr><td>H</td><td>ح (haa)</td><td>Hasan (حَسَن)</td></tr>
-                <tr><td>kh</td><td>خ (khaa)</td><td>khubz (خُبْز)</td></tr>
-                <tr><td>d</td><td>د (dal)</td><td>dars (دَرْس)</td></tr>
-                <tr><td>dh</td><td>ذ (thal)</td><td>dhahab (ذَهَب)</td></tr>
-                <tr><td>r</td><td>ر (raa)</td><td>rajul (رَجُل)</td></tr>
-                <tr><td>z</td><td>ز (zay)</td><td>zayt (زَيْت)</td></tr>
-                <tr><td>s</td><td>س (seen)</td><td>samak (سَمَك)</td></tr>
-                <tr><td>sh</td><td>ش (sheen)</td><td>shams (شَمْس)</td></tr>
-                <tr><td>S</td><td>ص (saad)</td><td>Sabr (صَبْر)</td></tr>
-                <tr><td>D</td><td>ض (daad)</td><td>Dayf (ضَيْف)</td></tr>
-                <tr><td>T</td><td>ط (taa)</td><td>Talib (طَالِب)</td></tr>
-                <tr><td>Z</td><td>ظ (dhaa)</td><td>Zahr (ظَهْر)</td></tr>
-                <tr><td>3</td><td>ع (ayn)</td><td>3ayn (عَيْن)</td></tr>
-                <tr><td>gh</td><td>غ (ghayn)</td><td>ghurfa (غُرْفَة)</td></tr>
-                <tr><td>f</td><td>ف (faa)</td><td>fil (فِيل)</td></tr>
-                <tr><td>q</td><td>ق (qaaf)</td><td>qalam (قَلَم)</td></tr>
-                <tr><td>k</td><td>ك (kaaf)</td><td>kitab (كِتَاب)</td></tr>
-                <tr><td>l</td><td>ل (laam)</td><td>layl (لَيْل)</td></tr>
-                <tr><td>m</td><td>م (meem)</td><td>madrasa (مَدْرَسَة)</td></tr>
-                <tr><td>N</td><td>ن (noon)</td><td>Nur (نُور)</td></tr>
-                <tr><td>h</td><td>ه (haa)</td><td>huna (هُنَا)</td></tr>
-                <tr><td>w</td><td>و (waaw)</td><td>walad (وَلَد)</td></tr>
-                <tr><td>y</td><td>ي (yaa)</td><td>yad (يَد)</td></tr>
-                <tr><td>:</td><td>ة (ta marbuta)</td><td>mudarrisa: (مُدَرِّسَة)</td></tr>
-                <tr><td>'</td><td>ء (hamza)</td><td>sa'ala (سَأَلَ)</td></tr>
-                <tr><td>A'</td><td>أ (hamza on alif)</td><td>A'mal (أَمَل)</td></tr>
-                <tr><td>I'</td><td>إ (hamza below alif)</td><td>I'slam (إِسْلَام)</td></tr>
-                <tr><td>Y</td><td>ى (alif maqsura)</td><td>ilY (إِلَى)</td></tr>
-                <tr><td>~A</td><td>آ (alif with madda)</td><td>~Amin (آمِين)</td></tr>
-                <tr><td>a</td><td>َ (fatha)</td><td>ka (كَ)</td></tr>
-                <tr><td>i</td><td>ِ (kasra)</td><td>ki (كِ)</td></tr>
-                <tr><td>u</td><td>ُ (damma)</td><td>ku (كُ)</td></tr>
-                <tr><td>an</td><td>ً (fathatan)</td><td>kitan (كِتَابًا)</td></tr>
-                <tr><td>in</td><td>ٍ (kasratan)</td><td>kitabin (كِتَابٍ)</td></tr>
-                <tr><td>un</td><td>ٌ (dammatan)</td><td>kitabun (كِتَابٌ)</td></tr>
-                <tr><td>^</td><td>ْ (sukun)</td><td>min^ (مِنْ)</td></tr>
-                <tr><td>*</td><td>ّ (shadda)</td><td>rab*i (رَبِّي)</td></tr>
-            </table>
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-guide-tab="letters-guide">Letters</button>
+                    <button class="tab-button" data-guide-tab="special-guide">Special</button>
+                    <button class="tab-button" data-guide-tab="numbers-guide">Numbers</button>
+                </div>
+                
+                <div id="letters-guide" class="tab-content active">
+                    <table>
+                        <tr>
+                            <th>Latin</th>
+                            <th>Arabic</th>
+                            <th>Example</th>
+                        </tr>
+                        <tr><td>A</td><td>ا (alif)</td><td>Alqalam (القلم)</td></tr>
+                        <tr><td>b</td><td>ب (baa)</td><td>bayt (بَيْت)</td></tr>
+                        <tr><td>t</td><td>ت (taa)</td><td>tamr (تَمْر)</td></tr>
+                        <tr><td>th</td><td>ث (thaa)</td><td>thalj (ثَلْج)</td></tr>
+                        <tr><td>j</td><td>ج (jeem)</td><td>jamal (جَمَل)</td></tr>
+                        <tr><td>H</td><td>ح (haa)</td><td>Hasan (حَسَن)</td></tr>
+                        <tr><td>kh</td><td>خ (khaa)</td><td>khubz (خُبْز)</td></tr>
+                        <tr><td>d</td><td>د (dal)</td><td>dars (دَرْس)</td></tr>
+                        <tr><td>dh</td><td>ذ (thal)</td><td>dhahab (ذَهَب)</td></tr>
+                        <tr><td>r</td><td>ر (raa)</td><td>rajul (رَجُل)</td></tr>
+                        <tr><td>z</td><td>ز (zay)</td><td>zayt (زَيْت)</td></tr>
+                        <tr><td>s</td><td>س (seen)</td><td>samak (سَمَك)</td></tr>
+                        <tr><td>sh</td><td>ش (sheen)</td><td>shams (شَمْس)</td></tr>
+                        <tr><td>S</td><td>ص (saad)</td><td>Sabr (صَبْر)</td></tr>
+                        <tr><td>D</td><td>ض (daad)</td><td>Dayf (ضَيْف)</td></tr>
+                        <tr><td>T</td><td>ط (taa)</td><td>Talib (طَالِب)</td></tr>
+                        <tr><td>Z</td><td>ظ (dhaa)</td><td>Zahr (ظَهْر)</td></tr>
+                        <tr><td>E</td><td>ع (ayn)</td><td>Eayn (عَيْن)</td></tr>
+                        <tr><td>gh</td><td>غ (ghayn)</td><td>ghurfa (غُرْفَة)</td></tr>
+                        <tr><td>f</td><td>ف (faa)</td><td>fil (فِيل)</td></tr>
+                        <tr><td>q</td><td>ق (qaaf)</td><td>qalam (قَلَم)</td></tr>
+                        <tr><td>k</td><td>ك (kaaf)</td><td>kitab (كِتَاب)</td></tr>
+                        <tr><td>l</td><td>ل (laam)</td><td>layl (لَيْل)</td></tr>
+                        <tr><td>m</td><td>م (meem)</td><td>madrasa (مَدْرَسَة)</td></tr>
+                        <tr><td>N</td><td>ن (noon)</td><td>Nur (نُور)</td></tr>
+                        <tr><td>h</td><td>ه (haa)</td><td>huna (هُنَا)</td></tr>
+                        <tr><td>w</td><td>و (waaw)</td><td>walad (وَلَد)</td></tr>
+                        <tr><td>y</td><td>ي (yaa)</td><td>yad (يَد)</td></tr>
+                        <tr><td>:</td><td>ة (ta marbuta)</td><td>mudarrisa: (مُدَرِّسَة)</td></tr>
+                    </table>
+                </div>
+                
+                <div id="special-guide" class="tab-content">
+                    <table>
+                        <tr>
+                            <th>Latin</th>
+                            <th>Arabic</th>
+                            <th>Example</th>
+                        </tr>
+                        <tr><td>'</td><td>ء (hamza)</td><td>sa'ala (سَأَلَ)</td></tr>
+                        <tr><td>A'</td><td>أ (hamza on alif)</td><td>A'mal (أَمَل)</td></tr>
+                        <tr><td>I'</td><td>إ (hamza below alif)</td><td>I'slam (إِسْلَام)</td></tr>
+                        <tr><td>w'</td><td>ؤ (hamza on waw)</td><td>su'aal (سُؤَال)</td></tr>
+                        <tr><td>y'</td><td>ئ (hamza on ya)</td><td>qaari' (قَارِئ)</td></tr>
+                        <tr><td>Y</td><td>ى (alif maqsura)</td><td>ilY (إِلَى)</td></tr>
+                        <tr><td>~A</td><td>آ (alif with madda)</td><td>~Amin (آمِين)</td></tr>
+                        <tr><td>a</td><td>َ (fatha)</td><td>ka (كَ)</td></tr>
+                        <tr><td>i</td><td>ِ (kasra)</td><td>ki (كِ)</td></tr>
+                        <tr><td>u</td><td>ُ (damma)</td><td>ku (كُ)</td></tr>
+                        <tr><td>an</td><td>ً (fathatan)</td><td>kitan (كِتَابًا)</td></tr>
+                        <tr><td>in</td><td>ٍ (kasratan)</td><td>kitabin (كِتَابٍ)</td></tr>
+                        <tr><td>un</td><td>ٌ (dammatan)</td><td>kitabun (كِتَابٌ)</td></tr>
+                        <tr><td>^</td><td>ْ (sukun)</td><td>min^ (مِنْ)</td></tr>
+                        <tr><td>*</td><td>ّ (shadda)</td><td>rab*i (رَبِّي)</td></tr>
+                    </table>
+                </div>
+                
+                <div id="numbers-guide" class="tab-content">
+                    <table>
+                        <tr>
+                            <th>Latin</th>
+                            <th>Arabic</th>
+                            <th>Name</th>
+                        </tr>
+                        <tr><td>0</td><td>٠</td><td>sifr</td></tr>
+                        <tr><td>1</td><td>١</td><td>waahid</td></tr>
+                        <tr><td>2</td><td>٢</td><td>ithnaan</td></tr>
+                        <tr><td>3</td><td>٣</td><td>thalaatha</td></tr>
+                        <tr><td>4</td><td>٤</td><td>arba'a</td></tr>
+                        <tr><td>5</td><td>٥</td><td>khamsa</td></tr>
+                        <tr><td>6</td><td>٦</td><td>sitta</td></tr>
+                        <tr><td>7</td><td>٧</td><td>sab'a</td></tr>
+                        <tr><td>8</td><td>٨</td><td>thamaania</td></tr>
+                        <tr><td>9</td><td>٩</td><td>tis'a</td></tr>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -351,7 +424,7 @@
             'D': 'ض', // daad
             'T': 'ط', // taa
             'Z': 'ظ', // dhaa
-            '3': 'ع', // ayn
+            'E': 'ع', // ayn (changed from '3' to 'E')
             'gh': 'غ', // ghayn
             'f': 'ف', // faa
             'q': 'ق', // qaaf
@@ -395,6 +468,18 @@
             
             // Special combinations
             'al-': 'ال', // al prefix
+            
+            // Arabic Numbers (direct mapping)
+            '0': '٠', // Arabic zero
+            '1': '١', // Arabic one
+            '2': '٢', // Arabic two
+            '3': '٣', // Arabic three
+            '4': '٤', // Arabic four
+            '5': '٥', // Arabic five
+            '6': '٦', // Arabic six
+            '7': '٧', // Arabic seven
+            '8': '٨', // Arabic eight
+            '9': '٩'  // Arabic nine
         };
         
         // Character categories for the keyboard
@@ -417,7 +502,7 @@
                 { latin: 'D', arabic: 'ض', name: 'daad' },
                 { latin: 'T', arabic: 'ط', name: 'taa' },
                 { latin: 'Z', arabic: 'ظ', name: 'dhaa' },
-                { latin: '3', arabic: 'ع', name: 'ayn' },
+                { latin: 'E', arabic: 'ع', name: 'ayn' }, // Changed from '3' to 'E'
                 { latin: 'gh', arabic: 'غ', name: 'ghayn' },
                 { latin: 'f', arabic: 'ف', name: 'faa' },
                 { latin: 'q', arabic: 'ق', name: 'qaaf' },
@@ -449,6 +534,18 @@
                 { latin: 'an', arabic: 'ً', name: 'fathatan' },
                 { latin: 'in', arabic: 'ٍ', name: 'kasratan' },
                 { latin: 'un', arabic: 'ٌ', name: 'dammatan' }
+            ],
+            numbers: [
+                { latin: '0', arabic: '٠', name: 'zero (sifr)' },
+                { latin: '1', arabic: '١', name: 'one (waahid)' },
+                { latin: '2', arabic: '٢', name: 'two (ithnaan)' },
+                { latin: '3', arabic: '٣', name: 'three (thalaatha)' },
+                { latin: '4', arabic: '٤', name: 'four (arba\'a)' },
+                { latin: '5', arabic: '٥', name: 'five (khamsa)' },
+                { latin: '6', arabic: '٦', name: 'six (sitta)' },
+                { latin: '7', arabic: '٧', name: 'seven (sab\'a)' },
+                { latin: '8', arabic: '٨', name: 'eight (thamaania)' },
+                { latin: '9', arabic: '٩', name: 'nine (tis\'a)' }
             ]
         };
         
@@ -464,7 +561,12 @@
         for (const [latin, arabic] of Object.entries(transliterationMap)) {
             // Only add to reverse map if not already there or if this is a shorter transliteration
             if (!reverseTransliterationMap[arabic] || latin.length < reverseTransliterationMap[arabic].length) {
-                reverseTransliterationMap[arabic] = latin;
+                // For numbers, prefer the direct digit format in reverse mapping
+                if (/^\d$/.test(latin)) {
+                    reverseTransliterationMap[arabic] = latin;
+                } else if (!reverseTransliterationMap[arabic] || !/^\d$/.test(reverseTransliterationMap[arabic])) {
+                    reverseTransliterationMap[arabic] = latin;
+                }
             }
         }
         
@@ -487,12 +589,14 @@
                 
                 // Check for multi-character mappings (like "A'", "I'", etc.)
                 for (let j = 3; j >= 2; j--) { // Check 3 and 2-character combinations
-                    const multiChar = processedText.substring(i, i + j);
-                    if (transliterationMap[multiChar]) {
-                        arabicText += transliterationMap[multiChar];
-                        i += j;
-                        matched = true;
-                        break;
+                    if (i + j <= processedText.length) {
+                        const multiChar = processedText.substring(i, i + j);
+                        if (transliterationMap[multiChar]) {
+                            arabicText += transliterationMap[multiChar];
+                            i += j;
+                            matched = true;
+                            break;
+                        }
                     }
                 }
                 
@@ -567,7 +671,7 @@
             return latinText;
         }
         
-        // Function to create a keyboard key
+        // Function to create a keyboard key for letters and characters
         function createKey(character, container) {
             const button = document.createElement('div');
             button.className = 'key';
@@ -609,7 +713,6 @@
                 } else {
                     // Insert into Latin input and convert to Arabic
                     const latinInput = document.getElementById('latin-input');
-                    const arabicOutput = document.getElementById('arabic-output');
                     
                     const cursorPos = latinInput.selectionStart;
                     const textBefore = latinInput.value.substring(0, cursorPos);
@@ -708,7 +811,7 @@
                 arabicOutput.value = '';
             });
             
-            // Tab navigation
+            // Tab navigation for keyboard
             document.querySelectorAll('.tab-button').forEach(button => {
                 button.addEventListener('click', () => {
                     // Set active tab
@@ -720,6 +823,24 @@
                     // Show active content
                     const tabId = button.getAttribute('data-tab');
                     document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Tab navigation for guide
+            document.querySelectorAll('[data-guide-tab]').forEach(button => {
+                button.addEventListener('click', () => {
+                    // Set active tab button
+                    document.querySelectorAll('[data-guide-tab]').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    button.classList.add('active');
+                    
+                    // Show active content
+                    const tabId = button.getAttribute('data-guide-tab');
+                    document.querySelectorAll('#letters-guide, #special-guide, #numbers-guide').forEach(content => {
                         content.classList.remove('active');
                     });
                     document.getElementById(tabId).classList.add('active');
@@ -777,6 +898,12 @@
                 // Rest are other diacritics
                 charCategories.diacritics.slice(3).forEach(char => {
                     createKey(char, otherDiacriticsRow);
+                });
+                
+                // Numbers
+                const numberRow = document.getElementById('number-row');
+                charCategories.numbers.forEach(char => {
+                    createKey(char, numberRow);
                 });
             }
             
