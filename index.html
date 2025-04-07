@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arabic Typing Tool (Enhanced)</title>
+    <title>Arabic Transliteration Keyboard</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
         }
         .container {
             background-color: white;
@@ -21,6 +21,13 @@
         h1 {
             color: #2c3e50;
             text-align: center;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-top: 0;
+            margin-bottom: 20px;
         }
         textarea {
             width: 100%;
@@ -30,7 +37,7 @@
             font-size: 18px;
             margin-bottom: 15px;
             box-sizing: border-box;
-            min-height: 120px;
+            line-height: 1.5;
         }
         #arabic-output {
             direction: rtl;
@@ -39,60 +46,16 @@
         }
         .keyboard-container {
             margin: 20px 0;
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-        }
-        .keyboard-row {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 10px;
-        }
-        .key {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 3px;
-            padding: 8px 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: #fff;
-            cursor: pointer;
-            transition: all 0.2s;
-            min-width: 35px;
-        }
-        .key:hover {
-            background-color: #e9e9e9;
-        }
-        .key:active {
-            background-color: #d4d4d4;
-        }
-        .key-label {
-            font-weight: bold;
-            font-size: 14px;
-        }
-        .arabic-char {
-            display: block;
-            font-size: 16px;
-            color: #777;
-            margin-top: 3px;
-        }
-        .prefix-notation {
-            display: block;
-            font-size: 10px;
-            color: #555;
-            margin-top: 2px;
         }
         .button-container {
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin: 10px 0;
+            margin: 15px 0;
+            flex-wrap: wrap;
         }
         .action-btn {
-            padding: 10px 15px;
+            padding: 10px 20px;
             background-color: #3498db;
             color: white;
             border: none;
@@ -104,811 +67,705 @@
         .action-btn:hover {
             background-color: #2980b9;
         }
-        .translate-btn {
-            background-color: #2ecc71;
-        }
-        .translate-btn:hover {
-            background-color: #27ae60;
-        }
-        .clear-btn {
-            background-color: #e74c3c;
-        }
-        .clear-btn:hover {
-            background-color: #c0392b;
-        }
-        .setting-row {
+        .section-header {
+            margin: 25px 0 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            color: #2c3e50;
             display: flex;
             align-items: center;
+        }
+        .section-icon {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        .char-button {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 70px;
+            height: 70px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .char-button:hover {
+            background-color: #e9e9e9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .char-button:active {
+            transform: translateY(0);
+            box-shadow: none;
+            background-color: #d5d8dc;
+        }
+        .arabic-char {
+            font-size: 28px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        .trans-char {
+            font-size: 14px;
+            color: #2c3e50;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .keyboard-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             margin-bottom: 10px;
-            padding: 10px;
-            background-color: #f0f8ff;
+        }
+        .note {
+            background-color: #eaf7fb;
+            border-left: 4px solid #3498db;
+            padding: 10px 15px;
+            margin: 15px 0;
+            font-size: 14px;
             border-radius: 4px;
         }
-        .setting-label {
-            flex: 1;
-            font-weight: bold;
-        }
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 46px;
-            height: 24px;
-            margin: 0 10px;
-        }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .toggle-slider {
-            background-color: #3498db;
-        }
-        input:checked + .toggle-slider:before {
-            transform: translateX(22px);
-        }
-        .toggle-status {
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin: 15px 0;
             font-size: 14px;
+            border-radius: 4px;
         }
-        .toggle-status.active {
-            color: #3498db;
-            font-weight: bold;
-        }
-        .instructions {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-left: 4px solid #2c3e50;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .tab-container {
-            margin-bottom: 15px;
-        }
-        .tab-buttons {
+        .sound-pair {
             display: flex;
-            border-bottom: 1px solid #ddd;
+            flex-direction: column;
             margin-bottom: 15px;
-        }
-        .tab-button {
-            padding: 8px 15px;
-            background-color: #f9f9f9;
-            border: none;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .tab-button.active {
-            border-bottom-color: #3498db;
-            color: #3498db;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .guide-hint {
-            font-size: 14px;
-            color: #666;
-            margin: 10px 0;
+            border: 1px solid #eee;
+            border-radius: 8px;
             padding: 10px;
             background-color: #fafafa;
-            border-radius: 4px;
         }
-        .caps-notice {
-            background-color: #fff3cd;
-            color: #856404;
-            padding: 8px 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
+        .sound-pair-title {
             font-size: 14px;
-            border-left: 4px solid #ffc107;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+            text-align: center;
         }
-        .caps-notice strong {
-            font-weight: bold;
+        .num3 {
+            background-color: #ffebee;
+            border: 2px solid #e74c3c;
         }
+        .num3 .trans-char {
+            color: #e74c3c;
+        }
+        .long-vowel {
+            background-color: #e8f5e9;
+        }
+        .wide {
+            width: 150px;
+        }
+        #claude-instructions {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f0f4f8;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+        }
+        #claude-message {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+            background-color: #fff;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Arabic Typing Tool</h1>
-        
-        <div class="setting-row">
-            <div class="setting-label">Bidirectional Sync:</div>
-            <div class="toggle-container">
-                <label class="toggle-switch">
-                    <input type="checkbox" id="sync-toggle" checked>
-                    <span class="toggle-slider"></span>
-                </label>
-                <span id="sync-status" class="toggle-status active">Active</span>
-            </div>
-        </div>
+        <h1>Arabic Transliteration Keyboard</h1>
+        <p class="subtitle">With proper academic transliteration</p>
         
         <div>
             <label for="latin-input"><strong>Type using Latin characters:</strong></label>
-            <textarea id="latin-input" placeholder="Type here using our transliteration system... Note: Capitalization matters! Capital letters like A, H, S, T, D, Z, E represent different Arabic letters than their lowercase counterparts."></textarea>
+            <textarea id="latin-input" rows="5" placeholder="Type here or use the buttons below..."></textarea>
         </div>
         
         <div>
             <label for="arabic-output"><strong>Arabic text:</strong></label>
-            <textarea id="arabic-output" placeholder="Arabic text appears here and can be edited directly..."></textarea>
-            <div class="button-container">
-                <button class="action-btn" id="copy-btn">Copy</button>
-                <button class="action-btn translate-btn" id="translate-btn">Translate</button>
-                <button class="action-btn clear-btn" id="clear-btn">Clear</button>
+            <textarea id="arabic-output" rows="5" placeholder="Arabic text appears here..."></textarea>
+        </div>
+        
+        <div class="button-container">
+            <button class="action-btn" id="copy-latin">Copy Latin Text</button>
+            <button class="action-btn" id="copy-arabic">Copy Arabic Text</button>
+            <button class="action-btn" id="claude-btn">Ask Claude</button>
+            <button class="action-btn" id="clear-btn">Clear All</button>
+        </div>
+        
+        <!-- Instructions section for Ask Claude -->
+        <div id="claude-instructions">
+            <h3>Ask Claude Instructions</h3>
+            <p>Here's a formatted message to send to Claude:</p>
+            <div id="claude-message" onclick="this.select()"></div>
+            <p>Instructions:</p>
+            <ol>
+                <li>Click in the box above to select all text</li>
+                <li>Copy the text (Ctrl+C or Command+C)</li>
+                <li>Paste it into your conversation with Claude</li>
+            </ol>
+        </div>
+        
+        <div class="warning">
+            <strong>Important:</strong> To type the Arabic number 3 (٣), use the highlighted number button below. The regular "3" key produces the letter ʿayn (ع).
+        </div>
+        
+        <!-- Numbers section -->
+        <h3 class="section-header"><span class="section-icon">🔢</span> Numbers</h3>
+        <div class="keyboard-row">
+            <div class="char-button" data-arabic="٠" data-latin="0">
+                <div class="arabic-char">٠</div>
+                <div class="trans-char">0</div>
+            </div>
+            <div class="char-button" data-arabic="١" data-latin="1">
+                <div class="arabic-char">١</div>
+                <div class="trans-char">1</div>
+            </div>
+            <div class="char-button" data-arabic="٢" data-latin="2">
+                <div class="arabic-char">٢</div>
+                <div class="trans-char">2</div>
+            </div>
+            <div class="char-button num3" data-arabic="٣" data-latin="#3">
+                <div class="arabic-char">٣</div>
+                <div class="trans-char">3</div>
+            </div>
+            <div class="char-button" data-arabic="٤" data-latin="4">
+                <div class="arabic-char">٤</div>
+                <div class="trans-char">4</div>
+            </div>
+            <div class="char-button" data-arabic="٥" data-latin="5">
+                <div class="arabic-char">٥</div>
+                <div class="trans-char">5</div>
+            </div>
+            <div class="char-button" data-arabic="٦" data-latin="6">
+                <div class="arabic-char">٦</div>
+                <div class="trans-char">6</div>
+            </div>
+            <div class="char-button" data-arabic="٧" data-latin="7">
+                <div class="arabic-char">٧</div>
+                <div class="trans-char">7</div>
+            </div>
+            <div class="char-button" data-arabic="٨" data-latin="8">
+                <div class="arabic-char">٨</div>
+                <div class="trans-char">8</div>
+            </div>
+            <div class="char-button" data-arabic="٩" data-latin="9">
+                <div class="arabic-char">٩</div>
+                <div class="trans-char">9</div>
             </div>
         </div>
         
-        <div class="keyboard-container">
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" data-tab="basic-chars">Basic</button>
-                    <button class="tab-button" data-tab="special-chars">Special</button>
-                    <button class="tab-button" data-tab="diacritics-chars">Diacritics</button>
-                    <button class="tab-button" data-tab="number-chars">Numbers</button>
+        <div class="note">
+            <strong>Note:</strong> This keyboard uses standard academic transliteration (ā, ī, ū, ṭ, ḍ, ṣ, etc.) for clearer distinction between sounds.
+        </div>
+        
+        <!-- Vowels section -->
+        <h3 class="section-header"><span class="section-icon">🔠</span> Vowels</h3>
+        <div class="keyboard-row">
+            <div class="char-button" data-arabic="َ" data-latin="a">
+                <div class="arabic-char">َ</div>
+                <div class="trans-char">a</div>
+            </div>
+            <div class="char-button" data-arabic="ِ" data-latin="i">
+                <div class="arabic-char">ِ</div>
+                <div class="trans-char">i</div>
+            </div>
+            <div class="char-button" data-arabic="ُ" data-latin="u">
+                <div class="arabic-char">ُ</div>
+                <div class="trans-char">u</div>
+            </div>
+            <div class="char-button long-vowel" data-arabic="ا" data-latin="ā">
+                <div class="arabic-char">ا</div>
+                <div class="trans-char">ā</div>
+            </div>
+            <div class="char-button long-vowel" data-arabic="ي" data-latin="ī">
+                <div class="arabic-char">ي</div>
+                <div class="trans-char">ī</div>
+            </div>
+            <div class="char-button long-vowel" data-arabic="و" data-latin="ū">
+                <div class="arabic-char">و</div>
+                <div class="trans-char">ū</div>
+            </div>
+        </div>
+        
+        <!-- Similar Sound Pairs section -->
+        <h3 class="section-header"><span class="section-icon">🔤</span> Similar Sound Pairs</h3>
+        
+        <div class="sound-pair">
+            <div class="sound-pair-title">T Sounds</div>
+            <div class="keyboard-row">
+                <div class="char-button" data-arabic="ت" data-latin="t">
+                    <div class="arabic-char">ت</div>
+                    <div class="trans-char">t</div>
                 </div>
-                
-                <div id="basic-chars" class="tab-content active">
-                    <div class="keyboard-row" id="alphabet-row-1"></div>
-                    <div class="keyboard-row" id="alphabet-row-2"></div>
-                    <div class="keyboard-row" id="alphabet-row-3"></div>
-                </div>
-                
-                <div id="special-chars" class="tab-content">
-                    <div class="keyboard-row" id="special-row-1"></div>
-                    <div class="keyboard-row" id="special-row-2"></div>
-                </div>
-                
-                <div id="diacritics-chars" class="tab-content">
-                    <div class="keyboard-row" id="diacritics-row"></div>
-                    <div class="keyboard-row" id="other-diacritics-row"></div>
-                </div>
-                
-                <div id="number-chars" class="tab-content">
-                    <div class="keyboard-row" id="number-row"></div>
+                <div class="char-button" data-arabic="ط" data-latin="ṭ">
+                    <div class="arabic-char">ط</div>
+                    <div class="trans-char">ṭ</div>
                 </div>
             </div>
         </div>
         
-        <div class="instructions">
-            <h3>Transliteration Guide</h3>
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" data-guide-tab="letters-guide">Letters</button>
-                    <button class="tab-button" data-guide-tab="special-guide">Special</button>
-                    <button class="tab-button" data-guide-tab="numbers-guide">Numbers</button>
+        <div class="sound-pair">
+            <div class="sound-pair-title">D Sounds</div>
+            <div class="keyboard-row">
+                <div class="char-button" data-arabic="د" data-latin="d">
+                    <div class="arabic-char">د</div>
+                    <div class="trans-char">d</div>
                 </div>
-                
-                <div id="letters-guide" class="tab-content active">
-                    <table>
-                        <tr>
-                            <th>Latin</th>
-                            <th>Arabic</th>
-                            <th>Example</th>
-                        </tr>
-                        <tr><td>A</td><td>ا (alif)</td><td>Alqalam (القلم)</td></tr>
-                        <tr><td>b</td><td>ب (baa)</td><td>bayt (بَيْت)</td></tr>
-                        <tr><td>t</td><td>ت (taa)</td><td>tamr (تَمْر)</td></tr>
-                        <tr><td>th</td><td>ث (thaa)</td><td>thalj (ثَلْج)</td></tr>
-                        <tr><td>j</td><td>ج (jeem)</td><td>jamal (جَمَل)</td></tr>
-                        <tr><td>H</td><td>ح (haa)</td><td>Hasan (حَسَن)</td></tr>
-                        <tr><td>kh</td><td>خ (khaa)</td><td>khubz (خُبْز)</td></tr>
-                        <tr><td>d</td><td>د (dal)</td><td>dars (دَرْس)</td></tr>
-                        <tr><td>dh</td><td>ذ (thal)</td><td>dhahab (ذَهَب)</td></tr>
-                        <tr><td>r</td><td>ر (raa)</td><td>rajul (رَجُل)</td></tr>
-                        <tr><td>z</td><td>ز (zay)</td><td>zayt (زَيْت)</td></tr>
-                        <tr><td>s</td><td>س (seen)</td><td>samak (سَمَك)</td></tr>
-                        <tr><td>sh</td><td>ش (sheen)</td><td>shams (شَمْس)</td></tr>
-                        <tr><td>S</td><td>ص (saad)</td><td>Sabr (صَبْر)</td></tr>
-                        <tr><td>D</td><td>ض (daad)</td><td>Dayf (ضَيْف)</td></tr>
-                        <tr><td>T</td><td>ط (taa)</td><td>Talib (طَالِب)</td></tr>
-                        <tr><td>Z</td><td>ظ (dhaa)</td><td>Zahr (ظَهْر)</td></tr>
-                        <tr><td>E</td><td>ع (ayn)</td><td>Eayn (عَيْن)</td></tr>
-                        <tr><td>gh</td><td>غ (ghayn)</td><td>ghurfa (غُرْفَة)</td></tr>
-                        <tr><td>f</td><td>ف (faa)</td><td>fil (فِيل)</td></tr>
-                        <tr><td>q</td><td>ق (qaaf)</td><td>qalam (قَلَم)</td></tr>
-                        <tr><td>k</td><td>ك (kaaf)</td><td>kitab (كِتَاب)</td></tr>
-                        <tr><td>l</td><td>ل (laam)</td><td>layl (لَيْل)</td></tr>
-                        <tr><td>m</td><td>م (meem)</td><td>madrasa (مَدْرَسَة)</td></tr>
-                        <tr><td>N</td><td>ن (noon)</td><td>Nur (نُور)</td></tr>
-                        <tr><td>h</td><td>ه (haa)</td><td>huna (هُنَا)</td></tr>
-                        <tr><td>w</td><td>و (waaw)</td><td>walad (وَلَد)</td></tr>
-                        <tr><td>y</td><td>ي (yaa)</td><td>yad (يَد)</td></tr>
-                        <tr><td>:</td><td>ة (ta marbuta)</td><td>mudarrisa: (مُدَرِّسَة)</td></tr>
-                    </table>
+                <div class="char-button" data-arabic="ض" data-latin="ḍ">
+                    <div class="arabic-char">ض</div>
+                    <div class="trans-char">ḍ</div>
                 </div>
-                
-                <div id="special-guide" class="tab-content">
-                    <table>
-                        <tr>
-                            <th>Latin</th>
-                            <th>Arabic</th>
-                            <th>Example</th>
-                        </tr>
-                        <tr><td>'</td><td>ء (hamza)</td><td>sa'ala (سَأَلَ)</td></tr>
-                        <tr><td>A'</td><td>أ (hamza on alif)</td><td>A'mal (أَمَل)</td></tr>
-                        <tr><td>I'</td><td>إ (hamza below alif)</td><td>I'slam (إِسْلَام)</td></tr>
-                        <tr><td>w'</td><td>ؤ (hamza on waw)</td><td>su'aal (سُؤَال)</td></tr>
-                        <tr><td>y'</td><td>ئ (hamza on ya)</td><td>qaari' (قَارِئ)</td></tr>
-                        <tr><td>Y</td><td>ى (alif maqsura)</td><td>ilY (إِلَى)</td></tr>
-                        <tr><td>~A</td><td>آ (alif with madda)</td><td>~Amin (آمِين)</td></tr>
-                        <tr><td>a</td><td>َ (fatha)</td><td>ka (كَ)</td></tr>
-                        <tr><td>i</td><td>ِ (kasra)</td><td>ki (كِ)</td></tr>
-                        <tr><td>u</td><td>ُ (damma)</td><td>ku (كُ)</td></tr>
-                        <tr><td>an</td><td>ً (fathatan)</td><td>kitan (كِتَابًا)</td></tr>
-                        <tr><td>in</td><td>ٍ (kasratan)</td><td>kitabin (كِتَابٍ)</td></tr>
-                        <tr><td>un</td><td>ٌ (dammatan)</td><td>kitabun (كِتَابٌ)</td></tr>
-                        <tr><td>^</td><td>ْ (sukun)</td><td>min^ (مِنْ)</td></tr>
-                        <tr><td>*</td><td>ّ (shadda)</td><td>rab*i (رَبِّي)</td></tr>
-                    </table>
+            </div>
+        </div>
+        
+        <div class="sound-pair">
+            <div class="sound-pair-title">S Sounds</div>
+            <div class="keyboard-row">
+                <div class="char-button" data-arabic="س" data-latin="s">
+                    <div class="arabic-char">س</div>
+                    <div class="trans-char">s</div>
                 </div>
-                
-                <div id="numbers-guide" class="tab-content">
-                    <table>
-                        <tr>
-                            <th>Latin</th>
-                            <th>Arabic</th>
-                            <th>Name</th>
-                        </tr>
-                        <tr><td>0</td><td>٠</td><td>sifr</td></tr>
-                        <tr><td>1</td><td>١</td><td>waahid</td></tr>
-                        <tr><td>2</td><td>٢</td><td>ithnaan</td></tr>
-                        <tr><td>3</td><td>٣</td><td>thalaatha</td></tr>
-                        <tr><td>4</td><td>٤</td><td>arba'a</td></tr>
-                        <tr><td>5</td><td>٥</td><td>khamsa</td></tr>
-                        <tr><td>6</td><td>٦</td><td>sitta</td></tr>
-                        <tr><td>7</td><td>٧</td><td>sab'a</td></tr>
-                        <tr><td>8</td><td>٨</td><td>thamaania</td></tr>
-                        <tr><td>9</td><td>٩</td><td>tis'a</td></tr>
-                    </table>
+                <div class="char-button" data-arabic="ص" data-latin="ṣ">
+                    <div class="arabic-char">ص</div>
+                    <div class="trans-char">ṣ</div>
                 </div>
+            </div>
+        </div>
+        
+        <div class="sound-pair">
+            <div class="sound-pair-title">Z Sounds</div>
+            <div class="keyboard-row">
+                <div class="char-button" data-arabic="ز" data-latin="z">
+                    <div class="arabic-char">ز</div>
+                    <div class="trans-char">z</div>
+                </div>
+                <div class="char-button" data-arabic="ظ" data-latin="ẓ">
+                    <div class="arabic-char">ظ</div>
+                    <div class="trans-char">ẓ</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sound-pair">
+            <div class="sound-pair-title">H Sounds</div>
+            <div class="keyboard-row">
+                <div class="char-button" data-arabic="ه" data-latin="h">
+                    <div class="arabic-char">ه</div>
+                    <div class="trans-char">h</div>
+                </div>
+                <div class="char-button" data-arabic="ح" data-latin="ḥ">
+                    <div class="arabic-char">ح</div>
+                    <div class="trans-char">ḥ</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Unique Arabic Sounds section -->
+        <h3 class="section-header"><span class="section-icon">🔊</span> Unique Arabic Sounds</h3>
+        <div class="keyboard-row">
+            <div class="char-button" data-arabic="ع" data-latin="ʿ">
+                <div class="arabic-char">ع</div>
+                <div class="trans-char">ʿ</div>
+            </div>
+            <div class="char-button" data-arabic="غ" data-latin="gh">
+                <div class="arabic-char">غ</div>
+                <div class="trans-char">gh</div>
+            </div>
+            <div class="char-button" data-arabic="ء" data-latin="ʾ">
+                <div class="arabic-char">ء</div>
+                <div class="trans-char">ʾ</div>
+            </div>
+            <div class="char-button" data-arabic="خ" data-latin="kh">
+                <div class="arabic-char">خ</div>
+                <div class="trans-char">kh</div>
+            </div>
+            <div class="char-button" data-arabic="ق" data-latin="q">
+                <div class="arabic-char">ق</div>
+                <div class="trans-char">q</div>
+            </div>
+        </div>
+        
+        <!-- Common Consonants section -->
+        <h3 class="section-header"><span class="section-icon">📝</span> Common Consonants</h3>
+        <div class="keyboard-row">
+            <div class="char-button" data-arabic="ب" data-latin="b">
+                <div class="arabic-char">ب</div>
+                <div class="trans-char">b</div>
+            </div>
+            <div class="char-button" data-arabic="ج" data-latin="j">
+                <div class="arabic-char">ج</div>
+                <div class="trans-char">j</div>
+            </div>
+            <div class="char-button" data-arabic="ث" data-latin="th">
+                <div class="arabic-char">ث</div>
+                <div class="trans-char">th</div>
+            </div>
+            <div class="char-button" data-arabic="ذ" data-latin="dh">
+                <div class="arabic-char">ذ</div>
+                <div class="trans-char">dh</div>
+            </div>
+            <div class="char-button" data-arabic="ر" data-latin="r">
+                <div class="arabic-char">ر</div>
+                <div class="trans-char">r</div>
+            </div>
+            <div class="char-button" data-arabic="ش" data-latin="sh">
+                <div class="arabic-char">ش</div>
+                <div class="trans-char">sh</div>
+            </div>
+            <div class="char-button" data-arabic="ف" data-latin="f">
+                <div class="arabic-char">ف</div>
+                <div class="trans-char">f</div>
+            </div>
+            <div class="char-button" data-arabic="ك" data-latin="k">
+                <div class="arabic-char">ك</div>
+                <div class="trans-char">k</div>
+            </div>
+            <div class="char-button" data-arabic="ل" data-latin="l">
+                <div class="arabic-char">ل</div>
+                <div class="trans-char">l</div>
+            </div>
+            <div class="char-button" data-arabic="م" data-latin="m">
+                <div class="arabic-char">م</div>
+                <div class="trans-char">m</div>
+            </div>
+            <div class="char-button" data-arabic="ن" data-latin="n">
+                <div class="arabic-char">ن</div>
+                <div class="trans-char">n</div>
+            </div>
+            <div class="char-button" data-arabic="و" data-latin="w">
+                <div class="arabic-char">و</div>
+                <div class="trans-char">w</div>
+            </div>
+            <div class="char-button" data-arabic="ي" data-latin="y">
+                <div class="arabic-char">ي</div>
+                <div class="trans-char">y</div>
+            </div>
+        </div>
+        
+        <!-- Special Marks section -->
+        <h3 class="section-header"><span class="section-icon">➕</span> Special Marks</h3>
+        <div class="keyboard-row">
+            <div class="char-button" data-arabic="ْ" data-latin="^">
+                <div class="arabic-char">ْ</div>
+                <div class="trans-char">^</div>
+            </div>
+            <div class="char-button" data-arabic="ّ" data-latin="+">
+                <div class="arabic-char">ّ</div>
+                <div class="trans-char">+</div>
+            </div>
+            <div class="char-button" data-arabic="ً" data-latin="a~">
+                <div class="arabic-char">ً</div>
+                <div class="trans-char">a~</div>
+            </div>
+            <div class="char-button" data-arabic="ٍ" data-latin="i~">
+                <div class="arabic-char">ٍ</div>
+                <div class="trans-char">i~</div>
+            </div>
+            <div class="char-button" data-arabic="ٌ" data-latin="u~">
+                <div class="arabic-char">ٌ</div>
+                <div class="trans-char">u~</div>
+            </div>
+            <div class="char-button" data-arabic="ة" data-latin="ẗ">
+                <div class="arabic-char">ة</div>
+                <div class="trans-char">ẗ</div>
+            </div>
+            <div class="char-button" data-arabic="ى" data-latin="ā">
+                <div class="arabic-char">ى</div>
+                <div class="trans-char">ā</div>
+            </div>
+        </div>
+        
+        <!-- Punctuation section -->
+        <h3 class="section-header"><span class="section-icon">⌨️</span> Punctuation & Space</h3>
+        <div class="keyboard-row">
+            <div class="char-button wide" data-arabic=" " data-latin=" ">
+                <div class="arabic-char">␣</div>
+                <div class="trans-char">Space</div>
+            </div>
+            <div class="char-button" data-arabic="،" data-latin=",">
+                <div class="arabic-char">،</div>
+                <div class="trans-char">,</div>
+            </div>
+            <div class="char-button" data-arabic="؟" data-latin="?">
+                <div class="arabic-char">؟</div>
+                <div class="trans-char">?</div>
+            </div>
+            <div class="char-button" data-arabic="." data-latin=".">
+                <div class="arabic-char">.</div>
+                <div class="trans-char">.</div>
             </div>
         </div>
     </div>
 
     <script>
-        // Track update source to prevent circular updates
-        let isUpdatingLatin = false;
-        let isUpdatingArabic = false;
-        
-        // Arabic transliteration mapping
-        const transliterationMap = {
-            // Basic letters
-            'A': 'ا', // alif
-            'b': 'ب', // baa
-            't': 'ت', // taa
-            'th': 'ث', // thaa
-            'j': 'ج', // jeem
-            'H': 'ح', // haa
-            'kh': 'خ', // khaa
-            'd': 'د', // dal
-            'dh': 'ذ', // thal
-            'r': 'ر', // raa
-            'z': 'ز', // zay
-            's': 'س', // seen
-            'sh': 'ش', // sheen
-            'S': 'ص', // saad
-            'D': 'ض', // daad
-            'T': 'ط', // taa
-            'Z': 'ظ', // dhaa
-            'E': 'ع', // ayn (changed from '3' to 'E')
-            'gh': 'غ', // ghayn
-            'f': 'ف', // faa
-            'q': 'ق', // qaaf
-            'k': 'ك', // kaaf
-            'l': 'ل', // laam
-            'm': 'م', // meem
-            'N': 'ن', // noon
-            'h': 'ه', // haa
-            'w': 'و', // waaw
-            'y': 'ي', // yaa
-            ':': 'ة', // ta marbuta
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const latinInput = document.getElementById('latin-input');
+            const arabicOutput = document.getElementById('arabic-output');
+            const copyLatinBtn = document.getElementById('copy-latin');
+            const copyArabicBtn = document.getElementById('copy-arabic');
+            const clearBtn = document.getElementById('clear-btn');
+            const claudeBtn = document.getElementById('claude-btn');
+            const claudeInstructions = document.getElementById('claude-instructions');
+            const claudeMessage = document.getElementById('claude-message');
             
-            // Hamza variants
-            "'": 'ء', // hamza
-            "A'": 'أ', // hamza on alif
-            "I'": 'إ', // hamza below alif
-            "w'": 'ؤ', // hamza on waw
-            "y'": 'ئ', // hamza on ya
-            
-            // Alif variants
-            'Y': 'ى', // alif maqsura
-            '~A': 'آ', // alif with madda
-            
-            // Space and common punctuation
-            ' ': ' ',
-            '.': '.',
-            ',': '،', // Arabic comma
-            '?': '؟', // Arabic question mark
-            
-            // Diacritics
-            'a': 'َ', // fatha
-            'i': 'ِ', // kasra
-            'u': 'ُ', // damma
-            '^': 'ْ', // sukoon
-            '*': 'ّ', // shadda
-            
-            // Tanwin
-            'an': 'ً', // fathatan
-            'in': 'ٍ', // kasratan
-            'un': 'ٌ', // dammatan
-            
-            // Special combinations
-            'al-': 'ال', // al prefix
-            
-            // Arabic Numbers (direct mapping)
-            '0': '٠', // Arabic zero
-            '1': '١', // Arabic one
-            '2': '٢', // Arabic two
-            '3': '٣', // Arabic three
-            '4': '٤', // Arabic four
-            '5': '٥', // Arabic five
-            '6': '٦', // Arabic six
-            '7': '٧', // Arabic seven
-            '8': '٨', // Arabic eight
-            '9': '٩'  // Arabic nine
-        };
-        
-        // Character categories for the keyboard
-        const charCategories = {
-            basic: [
-                { latin: 'A', arabic: 'ا', name: 'alif' },
-                { latin: 'b', arabic: 'ب', name: 'baa' },
-                { latin: 't', arabic: 'ت', name: 'taa' },
-                { latin: 'th', arabic: 'ث', name: 'thaa' },
-                { latin: 'j', arabic: 'ج', name: 'jeem' },
-                { latin: 'H', arabic: 'ح', name: 'haa' },
-                { latin: 'kh', arabic: 'خ', name: 'khaa' },
-                { latin: 'd', arabic: 'د', name: 'dal' },
-                { latin: 'dh', arabic: 'ذ', name: 'thal' },
-                { latin: 'r', arabic: 'ر', name: 'raa' },
-                { latin: 'z', arabic: 'ز', name: 'zay' },
-                { latin: 's', arabic: 'س', name: 'seen' },
-                { latin: 'sh', arabic: 'ش', name: 'sheen' },
-                { latin: 'S', arabic: 'ص', name: 'saad' },
-                { latin: 'D', arabic: 'ض', name: 'daad' },
-                { latin: 'T', arabic: 'ط', name: 'taa' },
-                { latin: 'Z', arabic: 'ظ', name: 'dhaa' },
-                { latin: 'E', arabic: 'ع', name: 'ayn' }, // Changed from '3' to 'E'
-                { latin: 'gh', arabic: 'غ', name: 'ghayn' },
-                { latin: 'f', arabic: 'ف', name: 'faa' },
-                { latin: 'q', arabic: 'ق', name: 'qaaf' },
-                { latin: 'k', arabic: 'ك', name: 'kaaf' },
-                { latin: 'l', arabic: 'ل', name: 'laam' },
-                { latin: 'm', arabic: 'م', name: 'meem' },
-                { latin: 'N', arabic: 'ن', name: 'noon' },
-                { latin: 'h', arabic: 'ه', name: 'haa' },
-                { latin: 'w', arabic: 'و', name: 'waaw' },
-                { latin: 'y', arabic: 'ي', name: 'yaa' },
-                { latin: ':', arabic: 'ة', name: 'ta marbuta' }
-            ],
-            special: [
-                { latin: "'", arabic: 'ء', name: 'hamza' },
-                { latin: "A'", arabic: 'أ', name: 'hamza on alif' },
-                { latin: "I'", arabic: 'إ', name: 'hamza below alif' },
-                { latin: "w'", arabic: 'ؤ', name: 'hamza on waw' },
-                { latin: "y'", arabic: 'ئ', name: 'hamza on ya' },
-                { latin: 'Y', arabic: 'ى', name: 'alif maqsura' },
-                { latin: '~A', arabic: 'آ', name: 'alif with madda' },
-                { latin: 'al-', arabic: 'ال', name: 'al prefix' }
-            ],
-            diacritics: [
-                { latin: 'a', arabic: 'َ', name: 'fatha' },
-                { latin: 'i', arabic: 'ِ', name: 'kasra' },
-                { latin: 'u', arabic: 'ُ', name: 'damma' },
-                { latin: '^', arabic: 'ْ', name: 'sukun' },
-                { latin: '*', arabic: 'ّ', name: 'shadda' },
-                { latin: 'an', arabic: 'ً', name: 'fathatan' },
-                { latin: 'in', arabic: 'ٍ', name: 'kasratan' },
-                { latin: 'un', arabic: 'ٌ', name: 'dammatan' }
-            ],
-            numbers: [
-                { latin: '0', arabic: '٠', name: 'zero (sifr)' },
-                { latin: '1', arabic: '١', name: 'one (waahid)' },
-                { latin: '2', arabic: '٢', name: 'two (ithnaan)' },
-                { latin: '3', arabic: '٣', name: 'three (thalaatha)' },
-                { latin: '4', arabic: '٤', name: 'four (arba\'a)' },
-                { latin: '5', arabic: '٥', name: 'five (khamsa)' },
-                { latin: '6', arabic: '٦', name: 'six (sitta)' },
-                { latin: '7', arabic: '٧', name: 'seven (sab\'a)' },
-                { latin: '8', arabic: '٨', name: 'eight (thamaania)' },
-                { latin: '9', arabic: '٩', name: 'nine (tis\'a)' }
-            ]
-        };
-        
-        // Special combinations to handle
-        const specialCombinations = {
-            'al-': 'ال',
-            'Al-': 'ال',
-            'AL-': 'ال'
-        };
-        
-        // Reverse mapping for Arabic to Latin conversion
-        const reverseTransliterationMap = {};
-        for (const [latin, arabic] of Object.entries(transliterationMap)) {
-            // Only add to reverse map if not already there or if this is a shorter transliteration
-            if (!reverseTransliterationMap[arabic] || latin.length < reverseTransliterationMap[arabic].length) {
-                // For numbers, prefer the direct digit format in reverse mapping
-                if (/^\d$/.test(latin)) {
-                    reverseTransliterationMap[arabic] = latin;
-                } else if (!reverseTransliterationMap[arabic] || !/^\d$/.test(reverseTransliterationMap[arabic])) {
-                    reverseTransliterationMap[arabic] = latin;
-                }
-            }
-        }
-        
-        // Reverse special combinations
-        const reverseSpecialCombinations = {
-            'ال': 'al-'
-        };
-        
-        // Function to convert Latin text to Arabic
-        function convertToArabic(latinText) {
-            let arabicText = '';
-            let i = 0;
-            
-            // Process shadda for characters followed by *
-            let processedText = latinText.replace(/(.)\*/g, '$1ّ');
-            
-            while (i < processedText.length) {
-                // Check for special combinations first
-                let matched = false;
+            // Character mapping for transliteration
+            const charMap = {
+                // Vowels with proper diacritics
+                'a': 'َ', 'i': 'ِ', 'u': 'ُ',
+                'ā': 'ا', 'ī': 'ي', 'ū': 'و',
                 
-                // Check for multi-character mappings (like "A'", "I'", etc.)
-                for (let j = 3; j >= 2; j--) { // Check 3 and 2-character combinations
-                    if (i + j <= processedText.length) {
-                        const multiChar = processedText.substring(i, i + j);
-                        if (transliterationMap[multiChar]) {
-                            arabicText += transliterationMap[multiChar];
-                            i += j;
-                            matched = true;
-                            break;
-                        }
-                    }
-                }
+                // Regular consonants
+                'b': 'ب', 't': 'ت', 'j': 'ج',
+                'h': 'ه', 'd': 'د', 'r': 'ر',
+                'z': 'ز', 's': 'س', 'f': 'ف',
+                'q': 'ق', 'k': 'ك', 'l': 'ل',
+                'm': 'م', 'n': 'ن', 'w': 'و',
+                'y': 'ي',
                 
-                if (matched) continue;
+                // Emphatic consonants with proper diacritics
+                'ṭ': 'ط', 'ḍ': 'ض', 'ṣ': 'ص',
+                'ẓ': 'ظ', 'ḥ': 'ح',
                 
-                // Check for special combinations like 'al-'
-                for (const combo of Object.keys(specialCombinations).sort((a, b) => b.length - a.length)) {
-                    if (processedText.substring(i, i + combo.length) === combo) {
-                        arabicText += specialCombinations[combo];
-                        i += combo.length;
-                        matched = true;
-                        break;
-                    }
-                }
+                // Special letters and combinations
+                'ʿ': 'ع', 'ʾ': 'ء',
+                'th': 'ث', 'dh': 'ذ', 'sh': 'ش',
+                'kh': 'خ', 'gh': 'غ',
                 
-                if (matched) continue;
+                // Diacritics and special marks
+                '^': 'ْ', '+': 'ّ',
+                'a~': 'ً', 'i~': 'ٍ', 'u~': 'ٌ',
+                'ẗ': 'ة',
                 
-                // Check for single character mapping
-                const oneChar = processedText[i];
-                if (transliterationMap[oneChar]) {
-                    arabicText += transliterationMap[oneChar];
-                } else {
-                    // For characters not in the map (pass through)
-                    arabicText += oneChar;
-                }
+                // Punctuation
+                ' ': ' ', ',': '،', '?': '؟', '.': '.',
                 
-                i++;
-            }
+                // Numbers
+                '0': '٠', '1': '١', '2': '٢',
+                '#3': '٣', // special marker for number 3
+                '4': '٤', '5': '٥', '6': '٦',
+                '7': '٧', '8': '٨', '9': '٩',
+                
+                // Fallback for users who still type capital letters
+                'A': 'ا', 'I': 'ي', 'U': 'و',
+                'T': 'ط', 'D': 'ض', 'S': 'ص', 
+                'Z': 'ظ', 'H': 'ح',
+                '3': 'ع' // Using 3 for ayn is common in Arabic chat
+            };
             
-            return arabicText;
-        }
-        
-        // Function to convert Arabic text to Latin (best effort)
-        function convertToLatin(arabicText) {
-            let latinText = '';
+            // Special combinations that need to be checked first (longer ones first)
+            const specialCombos = ['a~', 'i~', 'u~', 'th', 'dh', 'sh', 'kh', 'gh'];
             
-            // First look for special combinations like 'ال' -> 'al-'
-            for (const [arabic, latin] of Object.entries(reverseSpecialCombinations)) {
-                arabicText = arabicText.replace(new RegExp(arabic, 'g'), `###${latin}###`);
-            }
+            // Set up all character buttons
+            const charButtons = document.querySelectorAll('.char-button');
             
-            // Process each character
-            for (let i = 0; i < arabicText.length; i++) {
-                const char = arabicText[i];
-                
-                // Skip special combination placeholders
-                if (arabicText.substring(i, i+3) === '###') {
-                    const endIndex = arabicText.indexOf('###', i+3);
-                    if (endIndex !== -1) {
-                        latinText += arabicText.substring(i+3, endIndex);
-                        i = endIndex + 2; // +2 because the loop will increment i by 1
-                        continue;
-                    }
-                }
-                
-                // Handle shadda - look for a character followed by the shadda mark
-                if (char === 'ّ' && i > 0) {
-                    // For shadda, just use the * notation
-                    latinText += '*';
-                    continue;
-                }
-                
-                // Look up in the reverse map
-                if (reverseTransliterationMap[char]) {
-                    latinText += reverseTransliterationMap[char];
-                } else {
-                    // For characters not in the map (pass through)
-                    latinText += char;
-                }
-            }
-            
-            return latinText;
-        }
-        
-        // Function to create a keyboard key for letters and characters
-        function createKey(character, container) {
-            const button = document.createElement('div');
-            button.className = 'key';
-            
-            const labelSpan = document.createElement('span');
-            labelSpan.className = 'key-label';
-            labelSpan.textContent = character.latin;
-            button.appendChild(labelSpan);
-            
-            const arabicSpan = document.createElement('span');
-            arabicSpan.className = 'arabic-char';
-            arabicSpan.textContent = character.arabic;
-            button.appendChild(arabicSpan);
-            
-            button.title = `${character.name} - Type "${character.latin}" to insert`;
-            
-            button.addEventListener('click', () => {
-                // Get the active element
-                const activeElement = document.activeElement;
-                const isArabicActive = activeElement === document.getElementById('arabic-output');
-                
-                if (isArabicActive) {
-                    // Insert directly into Arabic output
-                    const cursorPos = activeElement.selectionStart;
-                    const textBefore = activeElement.value.substring(0, cursorPos);
-                    const textAfter = activeElement.value.substring(cursorPos);
+            charButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    // Get character data
+                    const arabicChar = button.getAttribute('data-arabic');
+                    let latinChar = button.getAttribute('data-latin');
                     
-                    // Insert the Arabic character directly
-                    activeElement.value = textBefore + character.arabic + textAfter;
+                    // Skip if missing data
+                    if (!arabicChar || !latinChar) return;
                     
-                    // Update cursor position
-                    activeElement.focus();
-                    activeElement.selectionStart = cursorPos + character.arabic.length;
-                    activeElement.selectionEnd = cursorPos + character.arabic.length;
-                    
-                    // Trigger input event to update Latin if sync is on
-                    const event = new Event('input', { bubbles: true });
-                    activeElement.dispatchEvent(event);
-                } else {
-                    // Insert into Latin input and convert to Arabic
-                    const latinInput = document.getElementById('latin-input');
-                    
+                    // Get cursor position in Latin input
                     const cursorPos = latinInput.selectionStart;
                     const textBefore = latinInput.value.substring(0, cursorPos);
                     const textAfter = latinInput.value.substring(cursorPos);
                     
-                    latinInput.value = textBefore + character.latin + textAfter;
+                    // Handle the special case for number 3
+                    if (latinChar === '#3') {
+                        // Insert just '3' but make sure it's treated as a number
+                        latinInput.value = textBefore + '3' + textAfter;
+                        
+                        // Update Arabic output by adding the Arabic 3
+                        updateArabicOutput();
+                    } else {
+                        // Insert the latin character
+                        latinInput.value = textBefore + latinChar + textAfter;
+                        
+                        // Update Arabic output
+                        updateArabicOutput();
+                    }
                     
-                    // Trigger input event to update Arabic
-                    const event = new Event('input', { bubbles: true });
-                    latinInput.dispatchEvent(event);
-                    
-                    // Update cursor position
+                    // Set focus back to Latin input and position cursor
                     latinInput.focus();
-                    latinInput.selectionStart = cursorPos + character.latin.length;
-                    latinInput.selectionEnd = cursorPos + character.latin.length;
-                }
+                    const newPos = cursorPos + (latinChar === '#3' ? 1 : latinChar.length);
+                    latinInput.selectionStart = newPos;
+                    latinInput.selectionEnd = newPos;
+                });
             });
             
-            container.appendChild(button);
-        }
-        
-        // Setup event listeners when the page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            const latinInput = document.getElementById('latin-input');
-            const arabicOutput = document.getElementById('arabic-output');
-            const copyBtn = document.getElementById('copy-btn');
-            const translateBtn = document.getElementById('translate-btn');
-            const clearBtn = document.getElementById('clear-btn');
-            const syncToggle = document.getElementById('sync-toggle');
-            const syncStatus = document.getElementById('sync-status');
-            
-            // Update Arabic output when Latin input changes
-            latinInput.addEventListener('input', () => {
-                if (isUpdatingLatin) return; // Prevent recursive updates
+            // Function to preprocess numeric 3s vs. letter 3 (ayn)
+            function preprocessNumbers(text) {
+                // Mark numeric 3s with # to distinguish from letter 3 (ayn)
+                let result = '';
+                let i = 0;
                 
-                isUpdatingArabic = true;
-                arabicOutput.value = convertToArabic(latinInput.value);
-                isUpdatingArabic = false;
-            });
-            
-            // Update Latin input when Arabic output changes (if sync is enabled)
-            arabicOutput.addEventListener('input', () => {
-                if (isUpdatingArabic) return;
-                
-                if (syncToggle.checked) {
-                    isUpdatingLatin = true;
-                    latinInput.value = convertToLatin(arabicOutput.value);
-                    isUpdatingLatin = false;
+                while (i < text.length) {
+                    // Check if current character is '3'
+                    if (text[i] === '3') {
+                        // Check if it's likely to be a number (context-based detection)
+                        let isNumber = false;
+                        
+                        // If surrounded by other numbers, it's likely a numeric 3
+                        if ((i > 0 && /[0-9]/.test(text[i-1])) || 
+                            (i < text.length - 1 && /[0-9]/.test(text[i+1]))) {
+                            isNumber = true;
+                        }
+                        
+                        // If followed by certain punctuation with no letter after, likely a number
+                        if (i === text.length - 1 || /[.,\s]/.test(text[i+1])) {
+                            isNumber = true;
+                        }
+                        
+                        // Mark numeric 3s with # prefix
+                        if (isNumber) {
+                            result += '#3';
+                        } else {
+                            result += '3'; // This will be treated as ayn (ع)
+                        }
+                    } else {
+                        result += text[i];
+                    }
+                    i++;
                 }
-            });
+                return result;
+            }
             
-            // Toggle bidirectional sync
-            syncToggle.addEventListener('change', () => {
-                if (syncToggle.checked) {
-                    syncStatus.textContent = 'Active';
-                    syncStatus.className = 'toggle-status active';
+            // Function to auto-convert capital letters to proper transliteration
+            function autoConvertLatinInput(text) {
+                // Mapping for auto-converting capital letters to proper transliteration
+                const autoConvertMap = {
+                    'A': 'ā', 'I': 'ī', 'U': 'ū',
+                    'T': 'ṭ', 'D': 'ḍ', 'S': 'ṣ', 
+                    'Z': 'ẓ', 'H': 'ḥ'
+                };
+                
+                let result = '';
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i];
+                    result += autoConvertMap[char] || char;
+                }
+                return result;
+            }
+            
+            // Function to update the Arabic output based on Latin input
+            function updateArabicOutput() {
+                let latinText = latinInput.value;
+                
+                // Auto-convert capital letters to proper transliteration
+                latinText = autoConvertLatinInput(latinText);
+                
+                // Update the Latin input with the converted text
+                latinInput.value = latinText;
+                
+                // First find any numeric 3s
+                latinText = preprocessNumbers(latinText);
+                
+                let arabicText = '';
+                let i = 0;
+                
+                while (i < latinText.length) {
+                    let matched = false;
                     
-                    // Update Latin based on current Arabic text
-                    isUpdatingLatin = true;
-                    latinInput.value = convertToLatin(arabicOutput.value);
-                    isUpdatingLatin = false;
-                } else {
-                    syncStatus.textContent = 'Inactive';
-                    syncStatus.className = 'toggle-status';
+                    // Check for special marker for number 3
+                    if (latinText.substring(i, i + 2) === '#3') {
+                        arabicText += '٣';
+                        i += 2;
+                        continue;
+                    }
+                    
+                    // Check for special combinations first
+                    for (let combo of specialCombos) {
+                        if (latinText.substring(i, i + combo.length) === combo) {
+                            arabicText += charMap[combo];
+                            i += combo.length;
+                            matched = true;
+                            break;
+                        }
+                    }
+                    
+                    // If no special combo matched, check for single characters
+                    if (!matched) {
+                        let char = latinText[i];
+                        if (charMap[char]) {
+                            arabicText += charMap[char];
+                        } else if (char === '3') {
+                            // If we reach here, it's a 3 that wasn't preprocessed as a number,
+                            // so we treat it as ayn
+                            arabicText += 'ع';
+                        } else {
+                            // For characters not in our map, keep them as is
+                            arabicText += char;
+                        }
+                        i++;
+                    }
                 }
+                
+                // Update Arabic output textarea
+                arabicOutput.value = arabicText;
+            }
+            
+            // Set up event listeners for input changes
+            latinInput.addEventListener('input', updateArabicOutput);
+            
+            // Set up copy buttons
+            copyLatinBtn.addEventListener('click', function() {
+                latinInput.select();
+                document.execCommand('copy');
+                alert('Latin text copied to clipboard');
             });
             
-            // Copy Arabic text to clipboard
-            copyBtn.addEventListener('click', () => {
+            copyArabicBtn.addEventListener('click', function() {
                 arabicOutput.select();
                 document.execCommand('copy');
-                copyBtn.textContent = 'Copied!';
-                setTimeout(() => {
-                    copyBtn.textContent = 'Copy';
-                }, 2000);
+                alert('Arabic text copied to clipboard');
             });
             
-            // Open in Google Translate
-            translateBtn.addEventListener('click', () => {
-                const arabicText = arabicOutput.value;
-                if (arabicText.trim() === '') {
-                    alert('Please enter some text to translate first.');
+            // Set up clear button
+            clearBtn.addEventListener('click', function() {
+                latinInput.value = '';
+                arabicOutput.value = '';
+                claudeInstructions.style.display = 'none';
+            });
+            
+            // Set up Claude button
+            claudeBtn.addEventListener('click', function() {
+                if (arabicOutput.value.trim() === '') {
+                    alert('Please enter some Arabic text first');
                     return;
                 }
                 
-                // Create Google Translate URL
-                const translateUrl = `https://translate.google.com/?sl=ar&tl=en&text=${encodeURIComponent(arabicText)}&op=translate`;
+                // Format message for Claude with both versions
+                const message = `What does this Arabic text mean?\n\nArabic: ${arabicOutput.value}\n\nCan you translate it to English and explain any grammar or vocabulary that's notable?`;
                 
-                // Open in new tab
-                window.open(translateUrl, '_blank');
+                // Update UI
+                claudeMessage.textContent = message;
+                claudeInstructions.style.display = 'block';
+                
+                // Select the text to make it easy to copy
+                const range = document.createRange();
+                range.selectNodeContents(claudeMessage);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
             });
-            
-            // Clear both text areas
-            clearBtn.addEventListener('click', () => {
-                latinInput.value = '';
-                arabicOutput.value = '';
-            });
-            
-            // Tab navigation for keyboard
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.addEventListener('click', () => {
-                    // Set active tab
-                    document.querySelectorAll('.tab-button').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    button.classList.add('active');
-                    
-                    // Show active content
-                    const tabId = button.getAttribute('data-tab');
-                    document.querySelectorAll('.tab-content').forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    document.getElementById(tabId).classList.add('active');
-                });
-            });
-            
-            // Tab navigation for guide
-            document.querySelectorAll('[data-guide-tab]').forEach(button => {
-                button.addEventListener('click', () => {
-                    // Set active tab button
-                    document.querySelectorAll('[data-guide-tab]').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    button.classList.add('active');
-                    
-                    // Show active content
-                    const tabId = button.getAttribute('data-guide-tab');
-                    document.querySelectorAll('#letters-guide, #special-guide, #numbers-guide').forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    document.getElementById(tabId).classList.add('active');
-                });
-            });
-            
-            // Create keyboard keys for each category
-            function populateKeyboard() {
-                // Basic letters (distributed across 3 rows)
-                const row1 = document.getElementById('alphabet-row-1');
-                const row2 = document.getElementById('alphabet-row-2');
-                const row3 = document.getElementById('alphabet-row-3');
-                
-                const lettersPerRow = Math.ceil(charCategories.basic.length / 3);
-                
-                charCategories.basic.forEach((char, index) => {
-                    let targetRow;
-                    if (index < lettersPerRow) {
-                        targetRow = row1;
-                    } else if (index < lettersPerRow * 2) {
-                        targetRow = row2;
-                    } else {
-                        targetRow = row3;
-                    }
-                    
-                    createKey(char, targetRow);
-                });
-                
-                // Special characters
-                const specialRow1 = document.getElementById('special-row-1');
-                const specialRow2 = document.getElementById('special-row-2');
-                
-                const specialPerRow = Math.ceil(charCategories.special.length / 2);
-                
-                charCategories.special.forEach((char, index) => {
-                    let targetRow;
-                    if (index < specialPerRow) {
-                        targetRow = specialRow1;
-                    } else {
-                        targetRow = specialRow2;
-                    }
-                    
-                    createKey(char, targetRow);
-                });
-                
-                // Diacritics
-                const diacriticsRow = document.getElementById('diacritics-row');
-                const otherDiacriticsRow = document.getElementById('other-diacritics-row');
-                
-                // First 3 are basic vowels
-                charCategories.diacritics.slice(0, 3).forEach(char => {
-                    createKey(char, diacriticsRow);
-                });
-                
-                // Rest are other diacritics
-                charCategories.diacritics.slice(3).forEach(char => {
-                    createKey(char, otherDiacriticsRow);
-                });
-                
-                // Numbers
-                const numberRow = document.getElementById('number-row');
-                charCategories.numbers.forEach(char => {
-                    createKey(char, numberRow);
-                });
-            }
-            
-            // Call the function to populate the keyboard
-            populateKeyboard();
         });
     </script>
 </body>
