@@ -37,6 +37,7 @@
       cursor: pointer;
     }
     .suggestion:hover { background: #ddd; }
+    #latinOutput { display: block; transition: all 0.2s ease; }
     @media (max-width: 600px) {
       .key-button { font-size: 12px; padding: 6px; min-width: 42px; min-height: 42px; }
       .key-button span.arabic { font-size: 18px; }
@@ -53,7 +54,7 @@
   <label>Type here (or use keyboard below):</label>
   <textarea id="inputBox" placeholder="Type using phonetic Latin..."></textarea>
 
-  <label>Latin Input (Visualized):</label>
+  <label id="visualLabel">Latin Input (Visualized):</label>
   <textarea id="latinOutput" readonly></textarea>
 
   <label>Arabic Output:</label>
@@ -75,7 +76,7 @@
       m: "م", n: "ن", w: "و", y: "ي", Y: "ى", "3": "ع",
       "'": "ء", "t:": "ة",
       "A'": "أ", "a'": "إ", "w'": "ؤ", "y'": "ئ",
-      "(la)": "لا", lA: "لا", laa: "لآ", "lA'": "لأ", "la'": "لإ",
+      "(la)": "لا", laa: "لآ", "la'": "لإ", "lA'": "لأ",
       a: "َ", i: "ِ", u: "ُ", "^": "ْ", "*": "ّ",
       "a~": "ً", "i~": "ٍ", "u~": "ٌ",
       "#3": "٣",
@@ -90,12 +91,20 @@
       m: "m", n: "n", w: "w", y: "y", Y: "ȳ",
       "3": "ع", "'": "ء", "t:": "ṯ",
       "A'": "أ", "a'": "إ", "w'": "ؤ", "y'": "ئ",
-      la: "لا", lA: "لا", laa: "لآ", "lA'": "لأ", "la'": "لإ",
       a: "a", i: "i", u: "u", "^": "ْ", "*": "ّ",
       "a~": "ً", "i~": "ٍ", "u~": "ٌ",
       "#3": "٣",
       ".": ".", ",": "،", ";": "؛", "?": "؟", "-": "ـ"
     };
+
+    const layout = [
+      ["A", "aa", "b", "t", "T", "th", "j", "H", "h", "kh"],
+      ["d", "D", "dh", "r", "z", "Z", "s", "S", "sh", "gh"],
+      ["f", "q", "k", "l", "m", "n", "w", "y", "Y", "3"],
+      ["'", "t:", "A'", "a'", "w'", "y'", "(la)", "laa", "la'", "lA'"] ,
+      ["a", "i", "u", "^", "*", "a~", "i~", "u~", "#3"],
+      [".", ",", ";", "?", "-"]
+    ];
 
     const predictions = {
       bism: "بسم", allah: "الله", rahman: "الرحمن", rahim: "الرحيم",
@@ -114,9 +123,11 @@
       updateOutputs();
       showSuggestions();
     });
+
     toggle.addEventListener("change", () => {
       renderKeyboard();
-      document.getElementById("latinOutput").style.display = toggle.checked ? "block" : "none";
+      latinBox.style.display = toggle.checked ? "block" : "none";
+      document.getElementById("visualLabel").style.display = toggle.checked ? "block" : "none";
     });
 
     function updateOutputs() {
@@ -150,7 +161,7 @@
       let i = 0;
       while (i < text.length) {
         let matched = false;
-        for (let len = 3; len > 0; len--) {
+        for (let len = 4; len > 0; len--) {
           const part = text.slice(i, i + len);
           if (latinToArabic[part]) {
             out += latinToArabic[part];
@@ -173,7 +184,7 @@
       let i = 0;
       while (i < text.length) {
         let matched = false;
-        for (let len = 3; len > 0; len--) {
+        for (let len = 4; len > 0; len--) {
           const part = text.slice(i, i + len);
           if (visualMap[part]) {
             out += visualMap[part];
@@ -201,15 +212,6 @@
       updateOutputs();
       showSuggestions();
     }
-
-    const layout = [
-      ["A", "aa", "b", "t", "T", "th", "j", "H", "h", "kh"],
-      ["d", "D", "dh", "r", "z", "Z", "s", "S", "sh", "gh"],
-      ["f", "q", "k", "l", "m", "n", "w", "y", "Y", "3"],
-      ["'", "t:", "A'", "a'", "w'", "y'", "la", "laa", "la'", "lA'"],
-      ["a", "i", "u", "^", "*", "a~", "i~", "u~", "#3"],
-      [".", ",", ";", "?", "-"]
-    ];
 
     function renderKeyboard() {
       keyboard.innerHTML = "";
